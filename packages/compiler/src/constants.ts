@@ -10,6 +10,7 @@ export const UN_REF_HELPER = 'unref'
 export const DEFAULT_MODEL_NAME = 'modelValue'
 export const DEFAULT_MODEL_MODIFIERS_NAME = 'modelModifiers'
 export const WITH_ASYNC_CONTEXT_HELPER = 'withAsyncContext'
+export const CREATE_PROPS_REST_PROXY_HELPER = 'createPropsRestProxy'
 
 /**
  * These macros can't be inside other expressions but just called directly.
@@ -130,6 +131,11 @@ export const VineBindingTypes = {
    * a literal constant, e.g. 'foo', 1, true
    */
   LITERAL_CONST: 'literal-const' as VueBindingTypes.LITERAL_CONST,
+
+  /**
+   * a destructured prop
+   */
+  DESTRUCTURED_PROP: 'destructured-prop' as const,
 } as const
 
 export const EXPECTED_ERROR = 'expected_error'

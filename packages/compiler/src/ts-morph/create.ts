@@ -1,31 +1,29 @@
 import type { TsMorphCache } from '../types'
-import { existsSync } from 'node:fs'
-import { dirname } from 'node:path'
+import { dirname, resolve } from 'node:path'
+import { getTsconfig } from 'get-tsconfig'
 import { Project } from 'ts-morph'
-import { findConfigFile } from 'typescript'
 
-export function createTsMorph(fileId?: string): TsMorphCache {
-  let project: Project
+export function createTsMorph(fileId: string): TsMorphCache {
+  let project = new Project()
 
   if (fileId) {
-    const tsConfigFilePath = findConfigFile(
-      dirname(fileId),
-      existsSync,
-    )
-    if (!tsConfigFilePath) {
+    const tsconfig = getTsconfig(dirname(fileId))
+
+    if (!tsconfig) {
       throw new Error('Cannot locate project\'s tsconfig.json')
     }
 
     project = new Project({
-      tsConfigFilePath,
+      tsConfigFilePath: tsconfig.path,
       compilerOptions: {
         strict: true, // Ensure more accurate type analysis
       },
     })
-  }
-  else {
-    fileId ??= 'vine.ts'
-    project = new Project()
+
+    // Read the reference configurations
+    tsconfig.config.references?.forEach((ref) => {
+      project.addSourceFilesFromTsConfig(resolve(tsconfig.path, '..', ref.path))
+    })
   }
 
   const typeChecker = project.getTypeChecker()

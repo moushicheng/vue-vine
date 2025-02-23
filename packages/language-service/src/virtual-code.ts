@@ -1,9 +1,9 @@
 import type { ArrowFunctionExpression, CallExpression, FunctionDeclaration, FunctionExpression } from '@babel/types'
-import type { CodeInformation, Mapping, VirtualCode, VueCompilerOptions } from '@vue/language-core'
 import type { VinePropMeta } from '@vue-vine/compiler'
+import type { CodeInformation, Mapping, VirtualCode, VueCompilerOptions } from '@vue/language-core'
 import type { Segment } from 'muggle-string'
 import type ts from 'typescript'
-import type { BabelToken, SpawnLogger, VueVineCode } from './shared'
+import type { BabelToken, VueVineCode } from './shared'
 import path from 'node:path/posix'
 import { isIdentifier, isTSTypeLiteral } from '@babel/types'
 import { generateTemplate } from '@vue/language-core'
@@ -151,7 +151,6 @@ export function createVueVineCode(
   compilerOptions: ts.CompilerOptions,
   vueCompilerOptions: VueCompilerOptions,
   target: 'extension' | 'tsc',
-  logger?: SpawnLogger,
 ): VueVineCode {
   // Compile `.vine.ts` with Vine's own compiler
   const compileStartTime = performance.now()
@@ -311,7 +310,6 @@ export function createVueVineCode(
   const tsCodeMappings = buildMappings(tsCodeSegments)
   const linkedCodeMappings: Mapping[] = getLinkedCodeMappings(tsCode)
 
-  logger?.log(`created in ${compileTime}ms.`)
   return {
     __VUE_VINE_VIRTUAL_CODE__: true,
     id: 'root',
@@ -418,6 +416,19 @@ export function createVueVineCode(
     return emitParam
   }
 
+  function generateModelProps(
+    vineCompFn: VineCompFn,
+    tabNum = 2,
+  ) {
+    const modelProps = `{${
+      Object.entries(vineCompFn.vineModels).map(([modelName, model]) => {
+        const { typeParameter } = model
+        return `\n${' '.repeat(tabNum + 2)}${modelName}: ${typeParameter ? vineFileCtx.getAstNodeContent(typeParameter) : 'unknown'}`
+      }).join(', ')
+    }\n}`
+    return modelProps
+  }
+
   function generateContextFormalParam(
     vineCompFn: VineCompFn,
     {
@@ -452,6 +463,13 @@ export function createVueVineCode(
     return contextFormalParam
   }
 
+  function generatePropsExtra(vineCompFn: VineCompFn) {
+    const commonProps = '__VINE_VLS_VineComponentCommonProps'
+    const emitProps = generateEmitProps(vineCompFn)
+    const modelProps = generateModelProps(vineCompFn)
+    return `& ${commonProps} & ${emitProps} & ${modelProps}`
+  }
+
   function generateComponentPropsAndContext(vineCompFn: VineCompFn) {
     tsCodeSegments.push('\n')
     if (vineCompFn.propsDefinitionBy === 'macro') {
@@ -479,12 +497,14 @@ export function createVueVineCode(
       // Define props by `vineProp`, no `props` formal parameter,
       // generate a `props` formal parameter in virtual code
       const propsParam = `\n  props: __VLS_${vineCompFn.fnName}_props__ & ${
-        generateEmitProps(vineCompFn, 2)
+        generatePropsExtra(vineCompFn)
       }, `
       tsCodeSegments.push(propsParam)
 
       // Generate `context: { ... }` after `props: ...`
-      tsCodeSegments.push(generateContextFormalParam(vineCompFn))
+      tsCodeSegments.push(
+        generateContextFormalParam(vineCompFn),
+      )
     }
     else {
       // User provide a `props` formal parameter in the component function,
@@ -493,8 +513,8 @@ export function createVueVineCode(
       generateScriptUntil(formalParamTypeNode.end!)
 
       // Generate `context: { ... }` after `props: ...`
-      tsCodeSegments.push(` & ${
-        generateEmitProps(vineCompFn, 2)
+      tsCodeSegments.push(`${
+        generatePropsExtra(vineCompFn)
       }, ${generateContextFormalParam(vineCompFn, {
         tabNum: 2,
         lineWrapAtStart: false,

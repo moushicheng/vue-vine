@@ -1,9 +1,14 @@
 {
   "name": "@vue-vine/compiler",
-  "version": "0.2.6",
+  "version": "0.3.10",
   "description": "Compiler for Vue Vine",
   "author": "ShenQingchuan",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vue-vine/vue-vine.git",
+    "directory": "packages/compiler"
+  },
   "keywords": [
     "Vue",
     "Vine"
@@ -26,7 +31,8 @@
     "build": "NODE_ENV=production tsup",
     "test": "vitest",
     "test:verbose": "VINE_DEV_VITEST=true vitest",
-    "prepublish": "pnpm run build"
+    "prepublish": "pnpm run build",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@babel/parser": "catalog:",
@@ -35,6 +41,7 @@
     "@vue/compiler-ssr": "catalog:",
     "@vue/shared": "catalog:",
     "estree-walker": "^2.0.2",
+    "get-tsconfig": "^4.10.0",
     "hash-sum": "^2.0.0",
     "line-column": "catalog:",
     "lru-cache": "^11.0.2",
@@ -42,14 +49,13 @@
     "merge-source-map": "^1.1.0",
     "postcss": "^8.4.29",
     "postcss-selector-parser": "^6.0.13",
-    "prettier": "catalog:",
-    "source-map-js": "^1.0.2",
-    "ts-morph": "catalog:",
-    "typescript": "catalog:"
+    "ts-morph": "catalog:"
   },
   "devDependencies": {
     "@types/hash-sum": "catalog:",
-    "@types/line-column": "catalog:"
+    "@types/line-column": "catalog:",
+    "prettier": "catalog:",
+    "source-map-js": "^1.2.1"
   },
   "publishConfig": {
     "access": "public",

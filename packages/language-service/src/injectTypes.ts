@@ -1,8 +1,8 @@
-import type { VueCompilerOptions } from '@vue/language-core'
 import type { VineFnCompCtx } from '@vue-vine/compiler'
+import type { VueCompilerOptions } from '@vue/language-core'
 import { posix as path } from 'node:path'
-import { generateGlobalTypes as _generateGlobalTypes } from '@vue/language-core'
 import { VineBindingTypes } from '@vue-vine/compiler'
+import { generateGlobalTypes as _generateGlobalTypes } from '@vue/language-core'
 
 export function setupGlobalTypes(
   rootDir: string,
@@ -25,7 +25,7 @@ export function setupGlobalTypes(
       dir = parentDir
     }
     const globalTypesPath = path.join(dir, 'node_modules', '.vue-global-types', `vine_${vueOptions.lib}_${vueOptions.target}_true.d.ts`)
-    const globalTypesContents = `// @ts-nocheck\nexport {};\n${generateGlobalTypes(vueOptions.lib, vueOptions.target, true)}`
+    const globalTypesContents = `// @ts-nocheck\nexport {};\n${generateGlobalTypes(vueOptions)}`
     host.writeFile(globalTypesPath, globalTypesContents)
     return globalTypesPath
   }
@@ -34,12 +34,8 @@ export function setupGlobalTypes(
   }
 }
 
-export function generateGlobalTypes(
-  lib: string,
-  target: number,
-  strictTemplates: boolean,
-) {
-  let globalTypes = _generateGlobalTypes(lib, target, strictTemplates)
+export function generateGlobalTypes(vueOptions: VueCompilerOptions) {
+  let globalTypes = _generateGlobalTypes(vueOptions)
 
   // Replace __VLS_Element
   globalTypes = globalTypes
@@ -53,11 +49,14 @@ export function generateGlobalTypes(
     /declare global\s*\{/,
     `declare global {
   const VUE_VINE_COMPONENT: unique symbol;
-  type StrictIsAny<T> = [unknown] extends [T]
+  type __StrictIsAny<T> = [unknown] extends [T]
     ? ([T] extends [unknown] ? true : false)
     : false;
+  type __OmitAny<T> = {
+    [K in keyof T as __StrictIsAny<T[K]> extends true ? never : K]: T[K]
+  }
   type MakeVLSCtx<T extends object> = {
-    [K in keyof T as StrictIsAny<T[K]> extends true ? never : K]: T[K]
+    [K in keyof T]: T[K]
   }
   const __createVineVLSCtx: <T>(ctx: T) => MakeVLSCtx<import('vue').UnwrapRef<T>>;
   type VueVineComponent = __VLS_Element;
@@ -68,6 +67,11 @@ export function generateGlobalTypes(
   type VueDefineEmits<T extends Record<string, any>> = UnionToIntersection<Exclude<RecordToUnion<{
       [K in keyof T]: (evt: K, ...args: Exclude<T[K], undefined>) => void;
   }>, undefined>>;
+
+  type __VLS_VineComponentCommonProps = {
+    key?: PropertyKey
+    ref?: string | import('vue').Ref | ((ref: Element | import('vue').ComponentPublicInstance | null, refs: Record<string, any>) => void);
+  }
     `,
   )
 
@@ -82,6 +86,21 @@ export function createLinkedCodeTag(
   itemLength: number,
 ) {
   return `/* __LINKED_CODE_${side.toUpperCase()}__#${itemLength} */`
+}
+
+function maybeDestructuredPropsToStr(vineCompFn: VineFnCompCtx) {
+  const { propsDestructuredNames } = vineCompFn
+  if (Object.keys(propsDestructuredNames).length === 0) {
+    return 'props'
+  }
+
+  const result = Object.entries(propsDestructuredNames).reduce((acc, [name, meta]) => {
+    const key = meta.alias ?? name
+    acc.push(`/* __LINKED_CODE_LEFT__#${key.length} */${key}: /* __LINKED_CODE_RIGHT__#${key.length} */${key}`)
+    return acc
+  }, [] as string[])
+
+  return `{ ${result.join(', ')} }`
 }
 
 export function generateVLSContext(
@@ -100,7 +119,6 @@ export function generateVLSContext(
       ],
     ), // Deduplicate same binding keys
   )
-  // const bindingEntries = Object.entries(vineCompFn.bindings)
   const notPropsBindings = bindingEntries.filter(
     ([, bindingType]) => (
       bindingType !== VineBindingTypes.PROPS
@@ -132,14 +150,17 @@ ${notPropsBindings.map(([name]) => {
 }).join('\n')}
   ${
     vineCompFn.propsDefinitionBy === 'annotaion'
-      ? '...props,'
+      ? `...${
+        maybeDestructuredPropsToStr(vineCompFn)
+      },`
       : '/* No props formal params */'
   }
 });
 const __VLS_localComponents = __VLS_ctx;
+type __VLS_LocalComponents = __OmitAny<typeof __VLS_localComponents>;
 const __VLS_components = {
   ...{} as __VLS_GlobalComponents,
-  ...__VLS_localComponents,
+  ...__VLS_localComponents as __VLS_LocalComponents,
 };
 `
 

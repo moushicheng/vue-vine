@@ -65,7 +65,7 @@ export const MyProfile = (() => {
     ],
     setup(__props, { emit: __emit, expose: __expose }) {
       const props = _useDefaults(__props, {
-        age: 18,
+        age: () => 18,
       });
       const { name, age, bio } = _toRefs(props);
 
@@ -187,25 +187,6 @@ export default MyApp;
 
 typeof __VUE_HMR_RUNTIME__ !== "undefined" &&
   __VUE_HMR_RUNTIME__.createRecord(MyApp.__hmrId, MyApp);
-export const _rerender_only = false;
-export const _rerender_vcf_fn_name = "";
-if (import.meta.hot) {
-  import.meta.hot.accept((mod) => {
-    if (!mod) {
-      return;
-    }
-    const { _rerender_only, _rerender_vcf_fn_name } = mod;
-    if (!_rerender_vcf_fn_name) {
-      return;
-    }
-    const component = mod[_rerender_vcf_fn_name];
-    if (_rerender_only) {
-      __VUE_HMR_RUNTIME__.rerender(component.__hmrId, component.render);
-    } else {
-      __VUE_HMR_RUNTIME__.reload(component.__hmrId, component);
-    }
-  });
-}
 "
 `;
 
@@ -274,7 +255,7 @@ export const MyProfile = (() => {
     ],
     setup(__props, { emit: __emit, expose: __expose }) {
       const props = _useDefaults(__props, {
-        age: 18,
+        age: () => 18,
       });
       const { name, age, bio } = _toRefs(props);
 
@@ -455,7 +436,7 @@ export const MyProfile = (() => {
     ],
     setup(__props, { emit: __emit, expose: __expose }) {
       const props = _useDefaults(__props, {
-        age: 18,
+        age: () => 18,
       });
       const { name, age, bio } = _toRefs(props);
 
@@ -493,7 +474,6 @@ export const MyProfile = (() => {
         defaultModelWithValue,
         title,
         count,
-        emits,
         textColor,
         handleRefresh,
         v1,
@@ -593,25 +573,6 @@ export default MyApp;
 
 typeof __VUE_HMR_RUNTIME__ !== "undefined" &&
   __VUE_HMR_RUNTIME__.createRecord(MyApp.__hmrId, MyApp);
-export const _rerender_only = false;
-export const _rerender_vcf_fn_name = "";
-if (import.meta.hot) {
-  import.meta.hot.accept((mod) => {
-    if (!mod) {
-      return;
-    }
-    const { _rerender_only, _rerender_vcf_fn_name } = mod;
-    if (!_rerender_vcf_fn_name) {
-      return;
-    }
-    const component = mod[_rerender_vcf_fn_name];
-    if (_rerender_only) {
-      __VUE_HMR_RUNTIME__.rerender(component.__hmrId, component.render);
-    } else {
-      __VUE_HMR_RUNTIME__.reload(component.__hmrId, component);
-    }
-  });
-}
 "
 `;
 
@@ -677,7 +638,7 @@ export const MyProfile = (() => {
     ],
     setup(__props, { emit: __emit, expose: __expose }) {
       const props = _useDefaults(__props, {
-        age: 18,
+        age: () => 18,
       });
       const { name, age, bio } = _toRefs(props);
 
@@ -715,7 +676,6 @@ export const MyProfile = (() => {
         defaultModelWithValue,
         title,
         count,
-        emits,
         textColor,
         handleRefresh,
         v1,
@@ -816,25 +776,42 @@ export default MyApp;
 
 typeof __VUE_HMR_RUNTIME__ !== "undefined" &&
   __VUE_HMR_RUNTIME__.createRecord(MyApp.__hmrId, MyApp);
-export const _rerender_only = false;
-export const _rerender_vcf_fn_name = "";
-if (import.meta.hot) {
-  import.meta.hot.accept((mod) => {
-    if (!mod) {
-      return;
-    }
-    const { _rerender_only, _rerender_vcf_fn_name } = mod;
-    if (!_rerender_vcf_fn_name) {
-      return;
-    }
-    const component = mod[_rerender_vcf_fn_name];
-    if (_rerender_only) {
-      __VUE_HMR_RUNTIME__.rerender(component.__hmrId, component.render);
-    } else {
-      __VUE_HMR_RUNTIME__.reload(component.__hmrId, component);
-    }
+"
+`;
+
+exports[`test transform > should generate export default in correct position 1`] = `
+"import {
+  openBlock as _openBlock,
+  createElementBlock as _createElementBlock,
+  defineComponent as _defineComponent,
+  useCssVars as _useCssVars,
+  unref as _unref,
+} from "vue";
+
+export const MyComp = (() => {
+  const __vine = _defineComponent({
+    name: "MyComp",
+    /* No props */
+    /* No emits */
+    setup(__props, { expose: __expose }) {
+      __expose();
+      const props = __props;
+
+      return (_ctx, _cache) => {
+        return _openBlock(), _createElementBlock("div", null, "Test");
+      };
+    },
   });
-}
+
+  __vine.__hmrId = "cc6366e8";
+
+  return __vine;
+})();
+
+export default MyComp;
+
+typeof __VUE_HMR_RUNTIME__ !== "undefined" &&
+  __VUE_HMR_RUNTIME__.createRecord(MyComp.__hmrId, MyComp);
 "
 `;
 
@@ -880,25 +857,78 @@ export const About = (() => {
 
 typeof __VUE_HMR_RUNTIME__ !== "undefined" &&
   __VUE_HMR_RUNTIME__.createRecord(About.__hmrId, About);
-export const _rerender_only = false;
-export const _rerender_vcf_fn_name = "";
-if (import.meta.hot) {
-  import.meta.hot.accept((mod) => {
-    if (!mod) {
-      return;
-    }
-    const { _rerender_only, _rerender_vcf_fn_name } = mod;
-    if (!_rerender_vcf_fn_name) {
-      return;
-    }
-    const component = mod[_rerender_vcf_fn_name];
-    if (_rerender_only) {
-      __VUE_HMR_RUNTIME__.rerender(component.__hmrId, component.render);
-    } else {
-      __VUE_HMR_RUNTIME__.reload(component.__hmrId, component);
-    }
+"
+`;
+
+exports[`test transform > should transform destructured props 1`] = `
+"import { useDefaults as _useDefaults } from "vue-vine";
+import {
+  toDisplayString as _toDisplayString,
+  openBlock as _openBlock,
+  createElementBlock as _createElementBlock,
+  defineComponent as _defineComponent,
+  useCssVars as _useCssVars,
+  unref as _unref,
+  createPropsRestProxy as _createPropsRestProxy,
+  toRefs as _toRefs,
+} from "vue";
+
+import { ref, watch } from "vue";
+
+export const MyComp = (() => {
+  const __vine = _defineComponent({
+    name: "MyComp",
+    props: {
+      "foo:zee": { required: true },
+      bar: {
+        /* Simple prop */
+      },
+      arr: { required: true },
+      other1: { required: true },
+      other2: { required: true },
+    },
+    /* No emits */
+    setup(__props, { expose: __expose }) {
+      __expose();
+      const props = _useDefaults(__props, {
+        bar: () => 1,
+      });
+      const __propsRestProxy = _createPropsRestProxy(__props, [
+        "foo:zee",
+        "bar",
+        "arr",
+      ]);
+      const { "foo:zee": fooZee, bar, arr, ...rest } = _toRefs(props);
+      const test1 = ref(props["foo:zee"]);
+
+      const test2 = watch(
+        () => props.bar,
+        (newVal) => {
+          console.log(newVal);
+        },
+      );
+
+      return (_ctx, _cache) => {
+        return (
+          _openBlock(),
+          _createElementBlock(
+            "div",
+            null,
+            _toDisplayString(_ctx.name),
+            1 /* TEXT */,
+          )
+        );
+      };
+    },
   });
-}
+
+  __vine.__hmrId = "7fffacdb";
+
+  return __vine;
+})();
+
+typeof __VUE_HMR_RUNTIME__ !== "undefined" &&
+  __VUE_HMR_RUNTIME__.createRecord(MyComp.__hmrId, MyComp);
 "
 `;
 
@@ -955,24 +985,5 @@ export const MyComp = (() => {
 
 typeof __VUE_HMR_RUNTIME__ !== "undefined" &&
   __VUE_HMR_RUNTIME__.createRecord(MyComp.__hmrId, MyComp);
-export const _rerender_only = false;
-export const _rerender_vcf_fn_name = "";
-if (import.meta.hot) {
-  import.meta.hot.accept((mod) => {
-    if (!mod) {
-      return;
-    }
-    const { _rerender_only, _rerender_vcf_fn_name } = mod;
-    if (!_rerender_vcf_fn_name) {
-      return;
-    }
-    const component = mod[_rerender_vcf_fn_name];
-    if (_rerender_only) {
-      __VUE_HMR_RUNTIME__.rerender(component.__hmrId, component.render);
-    } else {
-      __VUE_HMR_RUNTIME__.reload(component.__hmrId, component);
-    }
-  });
-}
 "
 `;

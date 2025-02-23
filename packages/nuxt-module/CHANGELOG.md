@@ -1,5 +1,86 @@
 # @vue-vine/nuxt
 
+## 0.2.10
+
+### Patch Changes
+
+- Fix language service - add missing common props for component.
+- Updated dependencies
+  - vue-vine@0.3.10
+
+## 0.2.9
+
+### Patch Changes
+
+- Fix language service types issue - conflicts with implicit any
+
+## 0.2.8
+
+### Patch Changes
+
+- Move compiler HMR inject code into Vite plugin for bundler agnostic.
+
+## 0.2.7
+
+### Patch Changes
+
+- Fix Nuxt pages mapping compatible issue with Vue Vine.
+
+## 0.2.6
+
+### Patch Changes
+
+- Fix HMR stability issue.
+
+## 0.2.5
+
+### Patch Changes
+
+- Fix undefined handling in HMR when ts-morph resolving.
+
+## 0.2.4
+
+### Patch Changes
+
+- Bump vue language tool v2.2.2 and fix default value in ts-morph case.
+
+## 0.2.3
+
+### Patch Changes
+
+- Re-implement the way of obtaining tsconfig and remove useless dependencies
+
+## 0.2.2
+
+### Patch Changes
+
+- Supplement some important feature support of vineModel.
+
+## 0.2.1
+
+### Patch Changes
+
+- Fix props destructure incompatible with useDefaults.
+
+## 0.2.0
+
+### Minor Changes
+
+- New feature: support props destructure, same as Vue 3.5
+
+## 0.1.9
+
+### Patch Changes
+
+- Fix ts-morph can't automatically handle tsconfig references child projects.
+
+## 0.1.7
+
+### Patch Changes
+
+- Fix incorrect position of 'export default' statement generation in Vine compiler.
+- Upgrade to Nuxt module builder v1.
+
 ## 0.1.5
 
 ### Patch Changes

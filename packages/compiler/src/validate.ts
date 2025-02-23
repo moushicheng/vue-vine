@@ -17,7 +17,9 @@ import {
   isArrayExpression,
   isIdentifier,
   isObjectExpression,
+  isObjectPattern,
   isObjectProperty,
+  isRestElement,
   isStringLiteral,
   isTaggedTemplateExpression,
   isTemplateLiteral,
@@ -46,7 +48,7 @@ import {
   CAN_BE_CALLED_MULTI_TIMES_MACROS,
   SUPPORTED_CSS_LANGS,
 } from './constants'
-import { vineErr } from './diagnostics'
+import { vineErr, vineWarn } from './diagnostics'
 import { _breakableTraverse } from './utils'
 import { colorful } from './utils/color-string'
 
@@ -68,16 +70,16 @@ type VineValidator = (
 function wrapVineValidatorWithLog(validators: VineValidator[]) {
   return process.env.VINE_DEV_VITEST === 'true'
     ? validators.map(validator => (...args: Parameters<VineValidator>) => {
-      const isPass = validator(...args)
-      // Bypass this ESLint is for local development to find out which test case is failed,
-      // eslint-disable-next-line no-console
-      console.log(`${
-        colorful(' VINE VALIDATE ', ['bgGreen', 'white'])
-      } ${validator.name} => ${
-        colorful(isPass ? 'PASS' : 'FAIL', [isPass ? 'green' : 'red'])
-      }`)
-      return isPass
-    })
+        const isPass = validator(...args)
+        // Bypass this ESLint is for local development to find out which test case is failed,
+        // eslint-disable-next-line no-console
+        console.log(`${
+          colorful(' VINE VALIDATE ', ['bgGreen', 'white'])
+        } ${validator.name} => ${
+          colorful(isPass ? 'PASS' : 'FAIL', [isPass ? 'green' : 'red'])
+        }`)
+        return isPass
+      })
     : validators
 }
 
@@ -708,35 +710,56 @@ function assertVineModelUsage(
 
   const typeParams = macroCallNode.typeParameters?.params
   const macroCallArgs = macroCallNode.arguments
+  const firstArg = macroCallArgs?.[0]
   const lastArg = macroCallArgs?.[macroCallArgs.length - 1]
+
+  if (firstArg) {
+    if (isObjectExpression(firstArg)) {
+      // PASS for this check
+    }
+    else if (!isStringLiteral(firstArg)) {
+      vineCompilerHooks.onError(
+        vineErr(
+          { vineFileCtx },
+          {
+            msg: 'The given vineModel name must be a string literal',
+            location: firstArg.loc,
+          },
+        ),
+      )
+    }
+  }
 
   if (typeParams?.length === 0) {
     // vineModel can be called without type parameter and argument,
     // if so, it's a `Ref<unknown>` type and user will notice that during reference it.
+    // But we can give a warning here.
     if (macroCallArgs?.length === 0) {
-      // PASS! Very simple case
+      vineCompilerHooks.onWarn(
+        vineWarn(
+          { vineFileCtx },
+          {
+            msg: '`vineModel` without type parameter will receive a `Ref<unknown>`.',
+            location: macroCallNode.loc,
+          },
+        ),
+      )
     }
     // Check the last argument, i.e. the options object literal
     // if there's not a 'default' field, report an error for no type parameter defined
     else if (
       isObjectExpression(lastArg)
-      && !lastArg.properties.some((prop) => {
-        if (
-          isObjectProperty(prop)
-          && isIdentifier(prop.key)
-          && prop.key.name === 'default'
-        ) {
-          return true
-        }
-
-        return false
-      })
+      && !lastArg.properties.some(prop => (
+        isObjectProperty(prop)
+        && isIdentifier(prop.key)
+        && prop.key.name === 'default'
+      ))
     ) {
       vineCompilerHooks.onError(
         vineErr(
           { vineFileCtx },
           {
-            msg: 'If `vineModel` macro call doesn\'t have type parameter, it must have a `default` field in the options object literal',
+            msg: 'If `vineModel` macro call doesn\'t have type parameter, it must have a `default` field in options',
             location: lastArg.loc,
           },
         ),
@@ -1095,21 +1118,50 @@ function validatePropsForSingelFC(
   }
   else if (vineCompFnParamsLength === 1) {
     // Check Vine component function's formal parameter first,
-    // it can only have one parameter, and its type annotation must be object literal
+    // it can only have one parameter, and it must have a type annotation
     const theOnlyFormalParam = vineCompFnParams[0]
     let isCheckFormalParamsPropPass = true
-    if (!isIdentifier(theOnlyFormalParam)) {
-      vineCompilerHooks.onError(
-        vineErr(
-          { vineFileCtx },
-          {
-            msg: 'If you\'re defining a Vine component function\'s props with formal parameter, it must be one and only identifier',
-            location: theOnlyFormalParam.loc,
-          },
-        ),
-      )
-      isCheckFormalParamsPropPass = false
+
+    if (isObjectPattern(theOnlyFormalParam)) {
+      // Make sure every destructured property is an identifier
+      for (const property of theOnlyFormalParam.properties) {
+        const isValidKey = (
+          (isRestElement(property) && isIdentifier(property.argument))
+          || (isObjectProperty(property) && (isIdentifier(property.key) || isStringLiteral(property.key)))
+        )
+        if (!isValidKey) {
+          isCheckFormalParamsPropPass = false
+          vineCompilerHooks.onError(
+            vineErr(
+              { vineFileCtx },
+              {
+                msg: `Invalid property name when defining props with formal parameter!`,
+                location: theOnlyFormalParam.loc,
+              },
+            ),
+          )
+        }
+
+        // Error on nested destructuring
+        if (
+          isObjectProperty(property)
+          && property.value.type.endsWith('Pattern')
+          && property.value.type !== 'AssignmentPattern'
+        ) {
+          isCheckFormalParamsPropPass = false
+          vineCompilerHooks.onError(
+            vineErr(
+              { vineFileCtx },
+              {
+                msg: 'When destructuring props on formal parameter, nested destructuring is not allowed',
+                location: property.loc,
+              },
+            ),
+          )
+        }
+      }
     }
+
     const theOnlyFormalParamTypeAnnotation = theOnlyFormalParam.typeAnnotation
     if (!theOnlyFormalParamTypeAnnotation) {
       vineCompilerHooks.onError(
@@ -1144,8 +1196,8 @@ function validatePropsForSingelFC(
           vineErr(
             { vineFileCtx },
             {
-              msg: 'Vine component function\'s props type annotation must be an object literal, '
-                + 'only contains properties signature, and all properties\' key must be string literal or identifier',
+              msg: 'When Vine component function\'s props type annotation is an object literal, '
+                + 'properties\' key must be an identifier or a string literal',
               location: propsTypeAnnotation.loc,
             },
           ),

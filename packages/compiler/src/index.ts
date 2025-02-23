@@ -31,14 +31,15 @@ export {
 
 export type {
   HMRCompFnsName,
-  VineCompFnCtx as VineFnCompCtx,
   VineCompilerCtx,
   VineCompilerHooks,
   VineCompilerOptions,
   VineDiagnostic,
   VineFileCtx,
+  VineCompFnCtx as VineFnCompCtx,
   VineProcessorLang,
   VinePropMeta,
+  VineQuery,
 } from './types'
 
 export {

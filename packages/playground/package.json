@@ -2,7 +2,6 @@
   "name": "@vue-vine/playground",
   "type": "module",
   "private": true,
-  "packageManager": "pnpm@9.0.6",
   "scripts": {
     "dev": "vite --port 3333",
     "build": "vite build",
@@ -15,7 +14,6 @@
     "@vueuse/core": "^12.3.0",
     "pinia": "^2.2.4",
     "sass": "^1.66.1",
-    "vue": "catalog:",
     "vue-router": "^4.2.4"
   },
   "devDependencies": {
@@ -24,10 +22,8 @@
     "@vue-vine/eslint-config": "workspace:*",
     "eslint": "catalog:",
     "less": "^4.2.0",
-    "typescript": "catalog:",
     "unocss": "catalog:",
     "unplugin-auto-import": "catalog:",
-    "vite": "catalog:",
     "vite-plugin-inspect": "catalog:",
     "vue-vine": "workspace:*"
   }

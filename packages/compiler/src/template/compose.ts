@@ -33,12 +33,12 @@ export function compileVineTemplate(
       templateParsedAst: (
         getParsedAst
           ? parse(source, {
-            parseMode: 'base',
-            prefixIdentifiers: true,
-            expressionPlugins: [
-              'typescript',
-            ],
-          })
+              parseMode: 'base',
+              prefixIdentifiers: true,
+              expressionPlugins: [
+                'typescript',
+              ],
+            })
           : (void 0)
       ),
     }
@@ -364,7 +364,10 @@ export function createSeparatedTemplateComposer(
 
       let setupFnReturns = '{ '
       for (const key in allBindings) {
-        if (allBindings[key] === false) {
+        if (
+          allBindings[key] === false
+          || (bindingMetadata[key] === VineBindingTypes.PROPS)
+        ) {
           // skip unused bindings
         }
         else if (
@@ -383,9 +386,6 @@ export function createSeparatedTemplateComposer(
             `get ${key}() { return ${key} }, `
             + `set ${key}(${setArg}) { ${key} = ${setArg} }, `
           )
-        }
-        else if (bindingMetadata[key] === VineBindingTypes.PROPS) {
-          // Skip props bindings
         }
         else {
           setupFnReturns += `${key}, `

@@ -69,11 +69,12 @@ export default defineConfig({
           ],
         },
         {
-          text: '定义说明',
+          text: '说明书',
           items: [
             { text: '总览', link: '/zh/specification/overview' },
             { text: 'Props', link: '/zh/specification/props' },
             { text: '宏函数', link: '/zh/specification/macros' },
+            { text: 'Vibe', link: '/zh/specification/vibe' },
           ],
         },
       ],
@@ -92,6 +93,7 @@ export default defineConfig({
             { text: 'Overview', link: '/specification/overview' },
             { text: 'Props', link: '/specification/props' },
             { text: 'Macros', link: '/specification/macros' },
+            { text: 'Vibe', link: '/specification/vibe' },
           ],
         },
       ],
@@ -108,10 +110,10 @@ export default defineConfig({
       themeConfig: {
         nav: [
           { text: 'Guide', link: '/introduction/quick-start' },
-          // {
-          //   text: 'Playground',
-          //   link: 'https://stackblitz.com/edit/github-uhgeyo?file=README.md',
-          // },
+          {
+            text: 'Playground',
+            link: 'https://stackblitz.com/~/github.com/vue-vine/stackblitz-playground',
+          },
         ],
       },
     },
@@ -121,10 +123,10 @@ export default defineConfig({
       themeConfig: {
         nav: [
           { text: '指引', link: '/zh/introduction/quick-start' },
-          // {
-          //   text: '演练场',
-          //   link: 'https://stackblitz.com/edit/github-uhgeyo?file=README.md',
-          // },
+          {
+            text: '演练场',
+            link: 'https://stackblitz.com/~/github.com/vue-vine/stackblitz-playground',
+          },
         ],
       },
     },

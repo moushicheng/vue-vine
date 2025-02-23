@@ -1,9 +1,14 @@
 {
   "name": "@vue-vine/eslint-parser",
-  "version": "0.2.13",
+  "version": "0.2.16",
   "description": "ESLint parser for Vue Vine",
   "author": "ShenQingchuan",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vue-vine/vue-vine.git",
+    "directory": "packages/eslint-parser"
+  },
   "keywords": [
     "Vue",
     "Vine"
@@ -26,11 +31,12 @@
     "build": "tsup",
     "test": "vitest",
     "test:dev": "vitest",
-    "prepublish": "pnpm run build"
+    "prepublish": "pnpm run build",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@typescript-eslint/parser": "^8.15.0",
-    "@typescript-eslint/scope-manager": "^8.15.0",
+    "@typescript-eslint/parser": "catalog:",
+    "@typescript-eslint/scope-manager": "catalog:",
     "@typescript-eslint/typescript-estree": "catalog:",
     "debug": "^4.3.4",
     "eslint-scope": "^8.2.0",
@@ -45,7 +51,9 @@
     "@types/lodash": "^4.14.201",
     "@types/node": "catalog:",
     "@types/semver": "^7.5.5",
+    "@typescript-eslint/types": "8.15.0",
     "eslint": "catalog:",
+    "eslint-visitor-keys": "^4.2.0",
     "lodash": "^4.17.21"
   }
 }

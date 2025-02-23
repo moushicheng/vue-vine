@@ -1,12 +1,13 @@
 {
   "name": "@vue-vine/language-service",
-  "version": "0.2.6",
+  "version": "0.3.10",
   "author": "ShenQingchuan",
   "license": "MIT",
   "homepage": "https://github.com/vue-vine/vue-vine#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vue-vine/vue-vine.git"
+    "url": "git+https://github.com/vue-vine/vue-vine.git",
+    "directory": "packages/language-service"
   },
   "bugs": {
     "url": "https://github.com/vue-vine/vue-vine/issues"
@@ -43,7 +44,8 @@
   "scripts": {
     "dev": "NODE_ENV=development tsup --watch",
     "build": "NODE_ENV=production tsup",
-    "prepublish": "pnpm run build"
+    "prepublish": "pnpm run build",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@volar/language-server": "catalog:",

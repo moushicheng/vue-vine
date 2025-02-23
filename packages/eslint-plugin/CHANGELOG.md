@@ -1,5 +1,23 @@
 # @vue-vine/eslint-plugin
 
+## 0.2.16
+
+### Patch Changes
+
+- Support vue 3.4 feature: v-bind shorthand
+
+## 0.2.15
+
+### Patch Changes
+
+- Fix dependencies for Vue Vine ESLint packages.
+
+## 0.2.14
+
+### Patch Changes
+
+- Fix incorrect position of 'export default' statement generation in Vine compiler.
+
 ## 0.2.13
 
 ### Patch Changes
