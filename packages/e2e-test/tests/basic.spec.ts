@@ -167,4 +167,40 @@ describe('test basic functionality', async () => {
       expect(await evaluator.getTextContent('.test-ts-morph-child:nth-child(2) .error-code')).toBe('err code: 404')
     },
   ))
+
+  it('should support various kinds of props type declaration', runTestAtPage(
+    '/vine-prop',
+    browserCtx,
+    async () => {
+      expect(await evaluator.getTextContent('.child-comp p:nth-child(1)')).toBe('prop1: hello')
+      expect(await evaluator.getTextContent('.child-comp p:nth-child(2)')).toBe('prop2: world')
+      expect(await evaluator.getTextContent('.child-comp p:nth-child(3)')).toBe('prop3: false')
+      expect(await evaluator.getTextContent('.child-comp p:nth-child(4)')).toBe('prop4: true')
+      expect(await evaluator.getTextContent('.child-comp p:nth-child(5)')).toBe('prop5: true')
+      expect(await evaluator.getTextContent('.child-comp p:nth-child(6)')).toBe('typeof prop6: boolean')
+    },
+  ))
+
+  it('should support vineSlots different use cases', runTestAtPage(
+    '/vine-slots',
+    browserCtx,
+    async () => {
+      // default slot
+      expect(await evaluator.getTextContent('.default-slot .custom-content')).toBe('Hello from slot content!')
+
+      // named slots
+      expect(await evaluator.getTextContent('.named-slots .slot-section.header .custom-content')).toMatchInlineSnapshot(`"This is the header content"`)
+      expect(await evaluator.getTextContent('.named-slots .slot-section.default .custom-content')).toMatchInlineSnapshot(`"This is the default slot content"`)
+      expect(await evaluator.getTextContent('.named-slots .slot-section.footer .custom-content')).toMatchInlineSnapshot(`"This is the footer content"`)
+
+      // scoped slots
+      expect(await evaluator.getTextContent('.scoped-slots .item-list:nth-child(2)')).toMatchInlineSnapshot(`"1. Apple1.5"`)
+      expect(await evaluator.getTextContent('.scoped-slots .item-list:nth-child(3)')).toMatchInlineSnapshot(`"2. Banana0.8"`)
+      expect(await evaluator.getTextContent('.scoped-slots .item-list:nth-child(4)')).toMatchInlineSnapshot(`"3. Orange2"`)
+
+      // slot with fallback
+      expect(await evaluator.getTextContent('.slot-with-fallback .slot-with-fallback-wrapper:nth-child(2) .custom-content')).toMatchInlineSnapshot(`"Custom content provided!"`)
+      expect(await evaluator.getTextContent('.slot-with-fallback .slot-with-fallback-wrapper:nth-child(3) .fallback')).toMatchInlineSnapshot(`" This is fallback content when no slot is provided "`)
+    },
+  ))
 })

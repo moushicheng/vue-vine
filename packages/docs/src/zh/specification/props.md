@@ -30,7 +30,7 @@ function MyComponent(props: {
 }) { ... }
 ```
 
-### 解构 `props` 形参 <VersionTip version="v0.3.0+" /> {#destructure-props-parameter}
+### 解构 `props` 形参 {#destructure-props-parameter}
 
 从 Vue Vine v0.3.0 版本开始，您可以解构 `props` 形参，并使用解构后的变量来访问 props 的属性。
 
@@ -43,7 +43,11 @@ function MyComponent({ foo, bar, ...rest }: {
 }) {
 
   watchEffect(() => {
-    console.log('foo: ', foo, ', bar: ', bar, ', rest: ', rest)
+    console.log(
+      'foo: ', foo,
+      ', bar: ', bar,
+      ', rest: ', rest
+    )
   })
 
   return vine`...`
@@ -59,7 +63,11 @@ import { createPropsRestProxy as _createPropsRestProxy } from 'vue'
 
   const rest = _createPropsRestProxy(props, ['foo', 'bar'])
   watchEffect(() => {
-    console.log('foo: ', props.foo, ', bar: ', props.bar, ', rest: ', rest)
+    console.log(
+      'foo: ', props.foo,
+      ', bar: ', props.bar,
+      ', rest: ', rest
+    )
   })
 
 // ...
@@ -78,7 +86,7 @@ function MyComponent({
 }
 ```
 
-### 使用更复杂的类型 <VersionTip version="v0.2.0+" /> {#using-complex-type-v0-2-0}
+### 使用更复杂的类型 {#using-complex-type}
 
 从 Vue Vine v0.2.0 版本开始，我们引入了 ts-morph 来解析 props 类型注解，因此您可以使用任何类型，而不仅仅是 `TSTypeLiteral`。
 
@@ -95,13 +103,19 @@ function MyComponent(props: SomeExternalType) {
 
 另外，在定义 props 的类型注解时，有一些特殊情况需要注意，比如布尔型的 props，见下文：
 
+::: warning 💡 注意
+
+ts-morph 在 Vue Vine 中是按需启用的，当您以 `TSTypeLiteral` 形式声明 props 类型时，ts-morph 默认不会启用。但当您的 props 类型包含泛型类型参数时，ts-morph 会自动启用。
+
+:::
+
 ### 布尔型转换机制 {#boolean-cast-mechanism}
 
 在编译时，我们必须知道一个属性是否为布尔型，以确定如何处理这样的属性传递：`<MyComponent foo />`。在 Web 标准 HTML 中，属性 `foo` 的值实际上是一个空字符串。
 
 因此，在使用对象字面量类型注解定义 props 时，你必须使用**字面量** `boolean` 注解来指定任何布尔型属性，不允许在这里使用其他在别处定义的类型，即使它最终的结果是布尔类型。
 
-<code version-tip style="font-size: 14px">v0.2.0+</code> 而对于使用 ts-morph 分析的情况，即形如 `props: SomeTypeName`，它将自动推断出某些属性是否为布尔型，但我们不能保证其完全正确，如果您发现任何异常情况，[同样请在 Github 上向我们提交此类问题](https://github.com/vue-vine/vue-vine/issues/new)。
+而对于使用 ts-morph 分析的情况，即形如 `props: SomeTypeName`，它将自动推断出某些属性是否为布尔型，但我们不能保证其完全正确，如果您发现任何异常情况，[同样请在 Github 上向我们提交此类问题](https://github.com/vue-vine/vue-vine/issues/new)。
 
 ```vue-vine
 function MyComponent(props: {
@@ -139,18 +153,17 @@ const title = vineProp<string>(value => value.startsWith('#'))
 
   由于 TypeScript 能够自动推断出默认值的类型，您不需要将类型参数传递给它。
 
-就像我们上面在 “布尔型转换机制” 部分所提到的，当您确实需要一个布尔型 prop 时，类型参数应该是一个字面量 `boolean`，并且不应该将变量作为默认值传递，而只能传递 `true` 或 `false` 字面量。尽管 TypeScript 可以从变量中推断出类型，但 Vine 编译器并没有嵌入 TypeScript 编译器来得知这个 prop 是布尔型的。
-
-这一条限制在 Vue Vine v0.2.0 引入了 ts-morph 后也依然存在，因为我们在 vineProp 这种定义方式中并未启用 ts-morph 来解析类型，按照设计，这条限制并不会太多影响日常使用，我们推荐您对于布尔型 prop 始终显式标注出类型。
+- 同样你也应该特别注意布尔型 prop 的定义，可以参考下面给出的完整示例：
 
 ```vue-vine
-// 正确示例
 const foo = vineProp.withDefault('bar') // 默认值可以自动推导出类型
 const biz = vineProp.withDefault(someStringVariable) // 默认值可以自动推导出类型
-const dar = vineProp<boolean>() // 明确指定为布尔型
-const bool = vineProp.withDefault(false) // 指定布尔型只能是 true 或 false
 
-// 错误示例
-const bad1 = vineProp<SomeBooleanType>() // 错误，因为 Vine 编译器不能解析出是布尔型
-const bad2 = vineProp.withDefault(someBooleanVariable) // 错误，因为 Vine 编译器不能解析出是布尔型
+// 明确指定为布尔型
+const dar = vineProp<boolean>()
+const bool = vineProp.withDefault(false)
+
+// 推导复杂类型
+const bad1 = vineProp<SomeBooleanType>() // Vine 编译器使用 ts-morph 解析出是布尔型
+const bad2 = vineProp.withDefault(someBooleanVariable) // Vine 编译器使用 ts-morph 推导出是布尔型
 ```

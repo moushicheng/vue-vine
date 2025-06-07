@@ -30,7 +30,7 @@ function MyComponent(props: {
 }) { ... }
 ```
 
-### Destructure `props` parameter <VersionTip version="v0.3.0+" />
+### Destructure `props` parameter
 
 Since Vue Vine v0.3.0, you can destructure the `props` parameter, and use the destructured variables to access a single prop or a subset of props.
 
@@ -43,7 +43,11 @@ function MyComponent({ foo, bar, ...rest }: {
 }) {
 
   watchEffect(() => {
-    console.log('foo: ', foo, ', bar: ', bar, rest: ', rest)
+    console.log(
+      'foo: ', foo,
+      ', bar: ', bar,
+      ', rest: ', rest
+    )
   })
 
   return vine`...`
@@ -59,7 +63,11 @@ import { createPropsRestProxy as _createPropsRestProxy } from 'vue'
 
   const rest = _createPropsRestProxy(props, ['foo', 'bar'])
   watchEffect(() => {
-    console.log('foo: ', props.foo, ', bar: ', props.bar, ', rest: ', rest)
+    console.log(
+      'foo: ', props.foo,
+      ', bar: ', props.bar,
+      ', rest: ', rest
+    )
   })
 
 // ...
@@ -78,9 +86,9 @@ function MyComponent({
 }
 ```
 
-### Using more complex type <VersionTip version="v0.2.0+" />
+### Using more complex type
 
-Since Vue Vine v0.2.0, we introduced ts-morph to resolve props type annotation, so you're able to use any type instead of only `TSTypeLiteral`.
+Since Vue Vine v0.2.0, we introduced [ts-morph](https://github.com/dsherret/ts-morph) to resolve props type annotation, so you're able to use any type instead of only `TSTypeLiteral`.
 
 ```vue-vine
 import type { SomeExternalType } from '../path/to/somewhere'
@@ -91,9 +99,15 @@ function MyComponent(props: SomeExternalType) {
 }
 ```
 
-If you found any bad case, [please raise an issue for us](https://github.com/vue-vine/vue-vine/issues/new).
+If you found any bad case, [please raise an issue](https://github.com/vue-vine/vue-vine/issues/new).
 
 Additionally, there's one special case for boolean props, see below:
+
+::: warning 💡 Mention
+
+ts-morph in Vue Vine is enabled on demand, it's not enabled by default when you declared your props type in `TSTypeLiteral`. But if your props type contains generic type parameters, ts-morph will be enabled automatically.
+
+:::
 
 ### Boolean cast mechanism
 
@@ -101,7 +115,7 @@ In compile time, we must know whether a prop is a boolean or not, in order to de
 
 So when you're using object literal type annotation for props, you must specify any boolean props with a **literal** `boolean` annotation, it's not allowed to use other named type here even it's finally computed to a boolean.
 
-<VersionTip style="font-size: 14px" version="v0.2.0+" /> For ts-morph analysis case i.e. `props: SomeTypeName`, it'll automatically infer if some prop is boolean or not, but we can't guarantee the correctness, if you found any bad case, [please raise an issue for us too](https://github.com/vue-vine/vue-vine/issues/new).
+For ts-morph analysis case i.e. `props: SomeTypeName`, it'll automatically infer if some prop is boolean or not, but we can't guarantee the correctness, if you found any bad case, [please raise an issue](https://github.com/vue-vine/vue-vine/issues/new).
 
 ```vue-vine
 function MyComponent(props: {
@@ -139,18 +153,17 @@ const title = vineProp<string>(value => value.startsWith('#'))
 
   Because of the ability of TypeScript to infer the type of default value, you don't need to pass the type argument to it.
 
-As we said in the "Boolean cast mechanism" section above, you should also notice that when you do need a boolean prop, the type parameter should be a literal `boolean`, and you should not pass a variable as default value, but only `true` or `false` literals. Although TypeScript can infer from the variable, but Vine compiler doesn't embed TypeScript compiler to know this prop is boolean.
-
-This restriction still exists after Vue Vine v0.2.0, because we didn't enable ts-morph to parse types in `vineProp` definition, according to the design, this restriction won't affect the daily usage much, we recommend you to explicitly annotate the type of boolean prop.
+- You should be aware of boolean props as well, see more complete examples below:
 
 ```vue-vine
-// Correct examples
 const foo = vineProp.withDefault('bar') // Default value can be automatically inferred
 const biz = vineProp.withDefault(someStringVariable) // Default value can be automatically inferred
-const dar = vineProp<boolean>() // Explicitly specify as boolean
-const bool = vineProp.withDefault(false) // Specify boolean must be true or false
 
-// Incorrect examples
-const bad1 = vineProp<SomeBooleanType>() // Error, because Vine compiler can't infer the type is boolean
-const bad2 = vineProp.withDefault(someBooleanVariable) // Error, because Vine compiler can't infer the type is boolean
+// Explicitly specify as boolean
+const dar = vineProp<boolean>()
+const bool = vineProp.withDefault(false)
+
+// Infer complex type
+const bad1 = vineProp<SomeBooleanType>() // Vine compiler uses ts-morph to infer the type is boolean
+const bad2 = vineProp.withDefault(someBooleanVariable) // Vine compiler uses ts-morph to infer the type is boolean
 ```

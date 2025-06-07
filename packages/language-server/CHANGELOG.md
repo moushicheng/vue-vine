@@ -1,5 +1,41 @@
 # @vue-vine/language-server
 
+## 1.4.7
+
+### Patch Changes
+
+- Support showing JSDoc for vineProp declaration.
+- Updated dependencies
+  - @vue-vine/compiler@1.4.7
+  - @vue-vine/language-service@1.4.7
+
+## 1.4.6
+
+### Patch Changes
+
+- Revert using transformWithOxc to avoid breaking in legacy Vite.
+- Updated dependencies
+  - @vue-vine/compiler@1.4.6
+  - @vue-vine/language-service@1.4.6
+
+## 1.4.5
+
+### Patch Changes
+
+- Feature support for referencing directives in language service.
+- Updated dependencies
+  - @vue-vine/compiler@1.4.5
+  - @vue-vine/language-service@1.4.5
+
+## 1.4.4
+
+### Patch Changes
+
+- Fix language service for vine file folding ranges.
+- Updated dependencies
+  - @vue-vine/compiler@1.4.4
+  - @vue-vine/language-service@1.4.4
+
 ## 1.4.3
 
 ### Patch Changes

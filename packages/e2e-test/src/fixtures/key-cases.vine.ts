@@ -1,3 +1,4 @@
+import type { Directive } from 'vue'
 import { onMounted, ref, useTemplateRef, watchEffect } from 'vue'
 
 const Foo = 123
@@ -59,9 +60,23 @@ export function TestPlainTextTemplate() {
   `
 }
 
+/**
+ This needs to be configured in shims.d.ts with:
+  declare module 'vue' {
+    interface HTMLAttributes {
+      border?: string
+    }
+  }
+ */
 export function TestUnoCssAttributeMode() {
+  const vBounce: Directive<HTMLElement> = {
+    mounted(el) {
+      el.classList.add('bounce')
+    }
+  }
+
   return vine`
-    <div border="1px solid red">
+    <div v-bounce border="1px solid red">
       <span>foo</span>
     </div>
   `
@@ -72,6 +87,7 @@ export function TestUnoCssAttributeMode() {
 
 // #region Fixtures for testing component reference & props check in VSCode
 function TestCompOne() {
+  /** @description zee is a string! */
   const zee = vineProp<string>()
   const foo = vineProp.withDefault(0)
 
@@ -114,6 +130,7 @@ function TargetComp(props: {
   return vine`
     <div @click="count++">Hello I'm target</div>
     <p>count: {{ count }}</p>
+    <TestCompOne zee="123" :foo="456" />
   `
 }
 

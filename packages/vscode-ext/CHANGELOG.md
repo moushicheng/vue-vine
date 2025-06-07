@@ -1,5 +1,29 @@
 # vue-vine-extension
 
+## 1.4.7
+
+### Patch Changes
+
+- Support showing JSDoc for vineProp declaration.
+
+## 1.4.6
+
+### Patch Changes
+
+- Revert using transformWithOxc to avoid breaking in legacy Vite.
+
+## 1.4.5
+
+### Patch Changes
+
+- Feature support for referencing directives in language service.
+
+## 1.4.4
+
+### Patch Changes
+
+- Fix language service for vine file folding ranges.
+
 ## 1.4.3
 
 ### Patch Changes

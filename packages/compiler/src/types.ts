@@ -2,6 +2,7 @@ import type { ParseResult, ParserOptions } from '@babel/parser'
 import type {
   ArrowFunctionExpression,
   CallExpression,
+  CommentBlock,
   ExportNamedDeclaration,
   File,
   FunctionDeclaration,
@@ -40,24 +41,24 @@ export type CountingMacros = Exclude<
   | 'vineProp.withDefault'
   | 'vineModel'
 >
-export type MacrosInfoForVolar =
-  | { macroType: 'vineProp', macroCall: CallExpression, macroMeta: VinePropMeta }
-  | { macroType: 'vineEmits', macroCall: CallExpression }
-  | { macroType: 'vineSlots', macroCall: CallExpression }
-  | { macroType: 'vineExpose', macroCall: CallExpression }
-  | { macroType: 'vineValidators', macroCall: CallExpression }
-  | { macroType: 'useTemplateRef', macroCall: CallExpression }
-  | { macroType: 'vineStyle', macroCall: CallExpression }
+export type MacrosInfoForVolar
+  = | { macroType: 'vineProp', macroCall: CallExpression, macroMeta: VinePropMeta }
+    | { macroType: 'vineEmits', macroCall: CallExpression }
+    | { macroType: 'vineSlots', macroCall: CallExpression }
+    | { macroType: 'vineExpose', macroCall: CallExpression }
+    | { macroType: 'vineValidators', macroCall: CallExpression }
+    | { macroType: 'useTemplateRef', macroCall: CallExpression }
+    | { macroType: 'vineStyle', macroCall: CallExpression }
 export type VineStyleValidArg = StringLiteral | TemplateLiteral | TaggedTemplateExpression
 
 export type VineProcessorLang = 'scss' | 'sass' | 'less' | 'stylus'
 export type VineStyleLang = 'css' | 'postcss' | VineProcessorLang
 export type VineTemplateBindings = Record<string, VueBindingTypes>
 
-export type BabelFunctionNodeTypes =
-  | FunctionDeclaration
-  | FunctionExpression
-  | ArrowFunctionExpression
+export type BabelFunctionNodeTypes
+  = | FunctionDeclaration
+    | FunctionExpression
+    | ArrowFunctionExpression
 export type BabelFunctionParams = BabelFunctionNodeTypes['params']
 
 export type HMRCompFnsName = string | null
@@ -103,6 +104,12 @@ export interface VineStyleMeta {
   compCtx: VineCompFnCtx
 }
 
+export interface VinePropMacroInfo {
+  macroCall: CallExpression
+  identifier: Identifier
+  jsDocComments?: CommentBlock[]
+}
+
 export interface VinePropMeta {
   typeAnnotationRaw?: string
   isFromMacroDefine: boolean
@@ -116,6 +123,7 @@ export interface VinePropMeta {
   macroDeclaredIdentifier?: Identifier
   /** Whether the prop name needs to be quoted */
   nameNeedQuoted?: boolean
+  jsDocComments?: CommentBlock[]
 }
 
 export interface VineCompilerCtx {
@@ -254,6 +262,7 @@ export interface VineCompFnCtx {
   getPropsTypeRecordStr: (options?: {
     joinStr?: string
     isNeedLinkedCodeTag?: boolean
+    isNeedJsDoc?: boolean
   }) => string
 }
 
